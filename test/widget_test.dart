@@ -1,30 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:fashion_store_app/main.dart';
+import 'package:fashion_store_app/presentation/screens/splash/splash_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('SplashScreen shows logo text and navigates to /onboarding', (
+    WidgetTester tester,
+  ) async {
+    // Dùng MaterialApp với route /onboarding trỏ tới một widget giả (Placeholder)
+    await tester.pumpWidget(
+      MaterialApp(
+        home: const SplashScreen(),
+        routes: {'/onboarding': (_) => const Scaffold(body: Placeholder())},
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // 1) Kiểm tra nội dung hiển thị ở Splash
+    expect(find.byIcon(Icons.shopping_bag), findsOneWidget);
+    expect(find.text('FASHION'), findsOneWidget);
+    expect(find.text('STORE'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // 2) Mô phỏng thời gian 3s để Timer trong Splash chạy
+    await tester.pump(const Duration(milliseconds: 100)); // frame đầu
+    await tester.pump(const Duration(seconds: 3)); // cho timer fire
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 3) Đã điều hướng sang /onboarding (Placeholder xuất hiện)
+    expect(find.byType(Placeholder), findsOneWidget);
+    // Và SplashScreen không còn trên màn
+    expect(find.byType(SplashScreen), findsNothing);
   });
 }
